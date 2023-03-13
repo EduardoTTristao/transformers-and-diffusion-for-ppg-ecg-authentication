@@ -1,0 +1,7 @@
+Dataset,sinal,ordem,undercut,uppercut,samplerate
+CapnoBase,ECG,4,0.083,1,2.1
+BIDMC,ECG,5,0.067,1,2.1
+TROIKA,ECG,5,0.083,1,2.1
+CapnoBase,PPG,3,0.083,1,3.1
+BIDMC,PPG,3,0.067,1,3.1
+TROIKA,PPG,3,0.083,1,3.1
