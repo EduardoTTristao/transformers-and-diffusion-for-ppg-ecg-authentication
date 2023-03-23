@@ -12,19 +12,27 @@ def rotulo_e_batimentos(filtro, sinal):
     for bd in ['BIDMC', 'CapnoBase', 'TROIKA']:
         x = []
         y = []
-        df = pd.read_csv(r'data-sets/' + bd + '/'+sinal.upper()+'/filtered_' + filtro + '.csv')
+
+        print(bd)
+
+        df = pd.read_csv(r'drive/MyDrive/data-sets/' + bd + '/'+sinal.upper()+'/filtered_' + filtro + '.csv')
         for i in df.index:
-            print('Indice: ' + str(i))
-            peaks, _ = find_peaks(np.array(df.iloc[i]), distance=50)
+            print('Lendo indivíduo número: ' + str(i))
+
+            np_array = np.array(df.iloc[i])
+
+            peaks, _ = find_peaks(np_array, distance=50)
 
             peaks = peaks[int(len(peaks) * 0.1):int(len(peaks) * 0.9)]
 
-            peaks = [x for x in peaks if
-                     np.array(df.iloc[i])[x] < np.mean(np.array(df.iloc[i])) + np.std(np.array(df.iloc[i])) * 3]
+            # mean = np.mean(np_array)
+            # std = np.std(np_array)
 
             for peak in peaks:
-                x.append(np.array(df.iloc[i])[peak - 60:peak + 60])
+                #if np_array[peak] < mean + std * 4:
+                x.append(np_array[peak - 60:peak + 60])
                 y.append(i)
+
         dfs[bd] = pd.DataFrame({'x': x, 'y': y})
     return dfs
 
