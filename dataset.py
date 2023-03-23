@@ -15,7 +15,7 @@ def rotulo_e_batimentos(filtro, sinal):
 
         print(bd)
 
-        df = pd.read_csv(r'drive/MyDrive/data-sets/' + bd + '/'+sinal.upper()+'/filtered_' + filtro + '.csv')
+        df = pd.read_csv(r'data-sets/' + bd + '/'+sinal.upper()+'/filtered_' + filtro + '.csv')
         for i in df.index:
             print('Lendo indivíduo número: ' + str(i))
 
@@ -35,6 +35,21 @@ def rotulo_e_batimentos(filtro, sinal):
 
         dfs[bd] = pd.DataFrame({'x': x, 'y': y})
     return dfs
+
+
+def autenticacoes_permissoes(df, num_adversarios):
+    df_final = {'x': [], 'y': []}
+    for x in range(0, 42):
+        users = df[df['y'] == x].sample(n=num_adversarios)
+        invaders = df[df['y'] != x].sample(n=num_adversarios)
+        for user_template in users['x']:
+            for invader in invaders['x']:
+                df_final['x'].append([user_template, invader])
+                df_final['y'].append(0)
+            for user in users['x']:
+                df_final['x'].append([user_template, user])
+                df_final['y'].append(1)
+    return df_final
 
 
 '''
