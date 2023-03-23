@@ -1,20 +1,21 @@
 import tensorflow as tf
 from keras import layers, losses, optimizers
-from arquitetura_NN import CNNEncoder, EnconderTransformer, FCLayer
+from arquitetura_NN import CNNEncoder, EnconderTransformer, FCLayer  # , CNNTransformer
 import numpy as np
 from dataset import autenticacoes_permissoes, rotulo_e_batimentos
 
+# hyperparametros
 num_layers_transformers = 2
 num_layers_cnn = 4
 num_filters = 32
-d_model = 128
-dff = 128
-num_heads = 8
+d_model = 64
+dff = 64
+num_heads = 4
 dropout_rate = 0.1
 kernel_size = 3
 max_pool_size = 2
 final_neurons = 128
-num_layers_dense = 2
+num_layers_dense = 1
 num_adversarios = 100
 
 

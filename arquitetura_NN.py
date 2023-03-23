@@ -168,7 +168,14 @@ class FCLayer(layers.Layer):
     def call(self, x):
         for i in range(self.num_layers+1):
             x = self.dense_layers[i](x)
+        try:
+            # Drop the keras mask, so it doesn't scale the losses/metrics.
+            # b/250038731
+            del x._keras_mask
+        except AttributeError:
+            pass
 
+        # Return the final output and the attention weights.
         return x
 
 
@@ -176,6 +183,8 @@ class FCLayer(layers.Layer):
     def __init__(self, *, num_layers_transformers, num_layers_cnn, num_filters, d_model, num_heads, dff,
                  dropout_rate=0.1, kernel_size, max_pool_size, final_neurons, num_layers_dense):
         super().__init__()
+
+        self.input_layer = layers.Input(shape=(2, 120, 1))
 
         self.enconder_cnn = CNNEncoder(num_layers=num_layers_cnn, filters=num_filters, kernel_size=kernel_size,
                                        max_pool_size=max_pool_size)
@@ -190,11 +199,15 @@ class FCLayer(layers.Layer):
 
     def call(self, x):
 
+        x = self.input_layer(x)
+
         x = self.enconder_cnn(x)
 
         x = self.flatten(x)
 
         x = self.encoder_trans(x)
+
+        x = self.flatten(x)
 
         logits = self.final_layer(x)
 
