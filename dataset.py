@@ -34,6 +34,8 @@ def rotulo_e_batimentos(filtro, sinal, modo='treino'):
 
             peaks = peaks[int(len(peaks) * 0.1):int(len(peaks) * 0.9)]
 
+            print(len(peaks))
+
             # mean = np.mean(np_array)
             # std = np.std(np_array)
 
@@ -48,7 +50,7 @@ def rotulo_e_batimentos(filtro, sinal, modo='treino'):
 
 def autenticacoes_permissoes(df, num_adversarios):
     df_final = {'x': [], 'y': []}
-    for x in range(0, df['y'].nunique()):
+    for x in df['y'].unique():
         users = df[df['y'] == x].sample(n=num_adversarios)
         invaders = df[df['y'] != x].sample(n=num_adversarios)
         for user_template in users['x']:
