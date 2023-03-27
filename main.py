@@ -3,6 +3,8 @@ from keras import layers, losses, optimizers
 from arquitetura_NN import CNNEncoder, EnconderTransformer, FCLayer  # , CNNTransformer
 import numpy as np
 from dataset import autenticacoes_permissoes, rotulo_e_batimentos
+import pandas as pd
+import datetime
 
 # hyperparametros
 num_layers_transformers = 2
@@ -21,7 +23,8 @@ num_adversarios = 100
 
 def main():
     dfs = rotulo_e_batimentos('butterworth', 'ecg')
-    df = autenticacoes_permissoes(dfs['CapnoBase'], num_adversarios)
+    df = autenticacoes_permissoes(pd.concat([dfs['CapnoBase'], dfs['BIDMC'], dfs['TROIKA']]), num_adversarios)
+    dfs = 0
     model = tf.keras.Sequential([layers.Input(shape=(2, 120, 1)),
                                  CNNEncoder(num_layers=num_layers_cnn, filters=num_filters,
                                             kernel_size=kernel_size, max_pool_size=max_pool_size),
@@ -34,9 +37,20 @@ def main():
     model.summary()
     model.compile(optimizer=optimizers.Adam(),
                   loss=losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+
+    checkpoint_path = "training_1/cp.ckpt"
+
+    # Create a callback that saves the model's weights
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                     save_weights_only=True,
+                                                     verbose=1)
+
+    log_dir = 'logs/fit/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
     df['x'] = np.expand_dims(np.array(df['x']), axis=-1)
     df['y'] = np.expand_dims(np.array(df['y']), axis=-1)
-    model.fit(df['x'], df['y'], epochs=10, batch_size=16)
+    model.fit(df['x'], df['y'], epochs=10, batch_size=16, callbacks=[tensorboard_callback, cp_callback])
 
 
 if __name__ == '__main__':

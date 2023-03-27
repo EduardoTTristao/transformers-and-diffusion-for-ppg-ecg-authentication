@@ -7,7 +7,7 @@ import numpy as np
 from random import randint
 
 
-def rotulo_e_batimentos(filtro, sinal):
+def rotulo_e_batimentos(filtro, sinal, modo='treino'):
     dfs = {}
     for bd in ['BIDMC', 'CapnoBase', 'TROIKA']:
         x = []
@@ -16,7 +16,16 @@ def rotulo_e_batimentos(filtro, sinal):
         print(bd)
 
         df = pd.read_csv(r'data-sets/' + bd + '/'+sinal.upper()+'/filtered_' + filtro + '.csv')
-        for i in df.index:
+
+        if modo == 'treino':
+            indices = df.index[0:int(len(df.index)*0.7)]
+        else:
+            if modo == 'teste':
+                indices = df.index[int(len(df.index)*0.7):int(len(df.index)*0.85)]
+            else:
+                indices = df.index[int(len(df.index)*0.85):0]
+
+        for i in indices:
             print('Lendo indivíduo número: ' + str(i))
 
             np_array = np.array(df.iloc[i])
@@ -29,9 +38,9 @@ def rotulo_e_batimentos(filtro, sinal):
             # std = np.std(np_array)
 
             for peak in peaks:
-                #if np_array[peak] < mean + std * 4:
+                # if np_array[peak] < mean + std * 4:
                 x.append(np_array[peak - 60:peak + 60])
-                y.append(i)
+                y.append(i + (42 if bd == 'BIDMC' else 0 if bd == 'CapnoBase' else 95))
 
         dfs[bd] = pd.DataFrame({'x': x, 'y': y})
     return dfs
@@ -39,7 +48,7 @@ def rotulo_e_batimentos(filtro, sinal):
 
 def autenticacoes_permissoes(df, num_adversarios):
     df_final = {'x': [], 'y': []}
-    for x in range(0, 42):
+    for x in range(0, df['y'].nunique()):
         users = df[df['y'] == x].sample(n=num_adversarios)
         invaders = df[df['y'] != x].sample(n=num_adversarios)
         for user_template in users['x']:
