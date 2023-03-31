@@ -10,7 +10,7 @@ class CNNEnconderLayer(layers.Layer):
     def __init__(self, filters, kernel_size, max_pool_size):
         super(CNNEnconderLayer, self).__init__()
         self.encoder = tf.keras.Sequential([
-            layers.Conv1D(filters=filters, kernel_size=kernel_size, activation="relu"),
+            layers.Conv1D(filters=filters, kernel_size=kernel_size, activation=layers.LeakyReLU(alpha=0.01)),
             layers.MaxPooling2D(pool_size=(1, max_pool_size)),
             layers.BatchNormalization()
         ])
@@ -94,7 +94,7 @@ class FeedForward(layers.Layer):
     def __init__(self, d_model, dff, dropout_rate=0.1):
         super().__init__()
         self.seq = tf.keras.Sequential([
-          tf.keras.layers.Dense(dff, activation='relu'),
+          tf.keras.layers.Dense(dff, activation=layers.LeakyReLU(alpha=0.01)),
           tf.keras.layers.Dense(d_model),
           tf.keras.layers.Dropout(dropout_rate)
         ])
@@ -162,7 +162,7 @@ class FCLayer(layers.Layer):
         self.dense_layers = []
 
         for _ in range(num_layers):
-            self.dense_layers.append(layers.Dense(neurons, activation='relu'))
+            self.dense_layers.append(layers.Dense(neurons, activation=layers.LeakyReLU(alpha=0.01)))
             self.dense_layers.append(layers.BatchNormalization())
         self.dense_layers.append(layers.Dense(2, activation='sigmoid'))
 

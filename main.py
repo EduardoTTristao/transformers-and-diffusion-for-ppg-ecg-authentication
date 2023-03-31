@@ -21,13 +21,15 @@ num_layers_dense = 3
 num_adversarios = 100
 GPU = 1
 
+
 def main():
     with tf.device('/device:GPU:'+str(GPU)):
-        for sinal_avaliado in ['ppg','ecg']:
+        for sinal_avaliado in ['ppg', 'ecg']:
             dfs = rotulo_e_batimentos('butterworth', sinal_avaliado)
             df = autenticacoes_permissoes(pd.concat([dfs['CapnoBase'], dfs['BIDMC'], dfs['TROIKA']]), num_adversarios)
             dfs = 0
             model = tf.keras.Sequential([layers.Input(shape=(2, 120, 1)),
+                                         layers.BatchNormalization(),
                                          CNNEncoder(num_layers=num_layers_cnn, filters=num_filters,
                                                     kernel_size=kernel_size, max_pool_size=max_pool_size),
                                          layers.Flatten(),
@@ -42,8 +44,8 @@ def main():
 
             checkpoint_path = "training_1/"+sinal_avaliado+"/cp.ckpt"
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-                                                         save_weights_only=True,
-                                                         verbose=1)
+                                                             save_weights_only=True,
+                                                             verbose=1)
 
             log_dir = 'logs/fit/' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
             tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
