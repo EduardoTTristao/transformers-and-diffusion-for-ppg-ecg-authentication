@@ -11,7 +11,8 @@ class CNNEnconderLayer(layers.Layer):
         super(CNNEnconderLayer, self).__init__()
         self.encoder = tf.keras.Sequential([
             layers.Conv1D(filters=filters, kernel_size=kernel_size, activation="relu"),
-            layers.MaxPooling2D(pool_size=(1, max_pool_size))
+            layers.MaxPooling2D(pool_size=(1, max_pool_size)),
+            layers.BatchNormalization()
         ])
 
     def call(self, x):
