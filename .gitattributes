@@ -1,1 +1,11 @@
 *.csv filter=lfs diff=lfs merge=lfs -text
+cp.* filter=lfs diff=lfs merge=lfs -text
+training_1 filter=lfs diff=lfs merge=lfs -text
+training_1/ecg filter=lfs diff=lfs merge=lfs -text
+training_1/ppg filter=lfs diff=lfs merge=lfs -text
+training_1/ecg/checkpoint filter=lfs diff=lfs merge=lfs -text
+training_1/ecg/cp.ckpt.data-00000-of-00001 filter=lfs diff=lfs merge=lfs -text
+training_1/ecg/cp.ckpt.index filter=lfs diff=lfs merge=lfs -text
+training_1/ppg/checkpoint filter=lfs diff=lfs merge=lfs -text
+training_1/ppg/cp.ckpt.data-00000-of-00001 filter=lfs diff=lfs merge=lfs -text
+training_1/ppg/cp.ckpt.index filter=lfs diff=lfs merge=lfs -text
