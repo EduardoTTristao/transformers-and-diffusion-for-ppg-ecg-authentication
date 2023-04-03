@@ -5,6 +5,7 @@ import numpy as np
 from dataset import autenticacoes_permissoes, rotulo_e_batimentos
 import pandas as pd
 import datetime
+import tensorflow_addons as tfa
 
 # hyperparametros
 num_layers_transformers = 4
@@ -19,12 +20,12 @@ max_pool_size = 2
 final_neurons = 256
 num_layers_dense = 3
 num_adversarios = 100
-GPU = 1
+GPU = 0
 
 
 def main():
     with tf.device('/device:GPU:'+str(GPU)):
-        for sinal_avaliado in ['ppg', 'ecg']:
+        for sinal_avaliado in ['ecg','ppg']:
             dfs = rotulo_e_batimentos('butterworth', sinal_avaliado)
             df = autenticacoes_permissoes(pd.concat([dfs['CapnoBase'], dfs['BIDMC'], dfs['TROIKA']]), num_adversarios)
             dfs = 0
@@ -39,10 +40,10 @@ def main():
                                          layers.Flatten(),
                                          FCLayer(num_layers=num_layers_dense, neurons=final_neurons)])
             model.summary()
-            model.compile(optimizer=optimizers.Adam(),
-                          loss=losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+            model.compile(optimizer=optimizers.Adam(0.001),
+                          loss=tfa.losses.TripletSemiHardLoss(), metrics=['accuracy'])
 
-            checkpoint_path = "training_1/"+sinal_avaliado+"/cp.ckpt"
+            checkpoint_path = "training_1/"+sinal_avaliado+"/"+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+"/cp.ckpt"
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                              save_weights_only=True,
                                                              verbose=1)
@@ -52,7 +53,7 @@ def main():
 
             df['x'] = np.expand_dims(np.array(df['x']), axis=-1)
             df['y'] = np.expand_dims(np.array(df['y']), axis=-1)
-            model.fit(df['x'], df['y'], epochs=10, batch_size=32, callbacks=[tensorboard_callback, cp_callback])
+            model.fit(df['x'], df['y'], epochs=20, batch_size=32, callbacks=[tensorboard_callback, cp_callback])
 
 
 if __name__ == '__main__':

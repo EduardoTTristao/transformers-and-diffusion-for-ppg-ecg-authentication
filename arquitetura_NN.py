@@ -165,6 +165,7 @@ class FCLayer(layers.Layer):
             self.dense_layers.append(layers.Dense(neurons, activation=layers.LeakyReLU(alpha=0.01)))
             self.dense_layers.append(layers.BatchNormalization())
         self.dense_layers.append(layers.Dense(2, activation='sigmoid'))
+        self.dense_layers.append(layers.Lambda(lambda x: tf.math.l2_normalize(x, axis=1)))
 
     def call(self, x):
         for i in range(self.num_layers+1):

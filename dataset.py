@@ -23,7 +23,7 @@ def rotulo_e_batimentos(filtro, sinal, modo='treino'):
             if modo == 'teste':
                 indices = df.index[int(len(df.index)*0.7):int(len(df.index)*0.85)]
             else:
-                indices = df.index[int(len(df.index)*0.85):0]
+                indices = df.index[int(len(df.index)*0.85):]
 
         for i in indices:
             print('Lendo indivíduo número: ' + str(i))
