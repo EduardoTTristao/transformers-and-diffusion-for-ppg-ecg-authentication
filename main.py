@@ -9,7 +9,7 @@ import tensorflow_addons as tfa
 
 # hyperparametros
 num_layers_transformers = 4
-num_layers_cnn = 4
+num_layers_cnn = 5
 num_filters = 64
 d_model = 256
 dff = 512
@@ -19,13 +19,14 @@ kernel_size = 3
 max_pool_size = 2
 final_neurons = 256
 num_layers_dense = 3
+neurons_input_transformers = 256
 num_adversarios = 100
 GPU = 0
 
 
 def main():
     with tf.device('/device:GPU:'+str(GPU)):
-        for sinal_avaliado in ['ecg','ppg']:
+        for sinal_avaliado in ['ecg', 'ppg']:
             dfs = rotulo_e_batimentos('butterworth', sinal_avaliado)
             df = autenticacoes_permissoes(pd.concat([dfs['CapnoBase'], dfs['BIDMC'], dfs['TROIKA']]), num_adversarios)
             dfs = 0
@@ -34,6 +35,8 @@ def main():
                                          CNNEncoder(num_layers=num_layers_cnn, filters=num_filters,
                                                     kernel_size=kernel_size, max_pool_size=max_pool_size),
                                          layers.Flatten(),
+                                         layers.Dense(neurons_input_transformers, activation=layers.LeakyReLU(alpha=0.01)),
+                                         layers.BatchNormalization(),
                                          EnconderTransformer(num_layers=num_layers_transformers, d_model=d_model,
                                                              num_heads=num_heads, dff=dff,
                                                              dropout_rate=dropout_rate),
