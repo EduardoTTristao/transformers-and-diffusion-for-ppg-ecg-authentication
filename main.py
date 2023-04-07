@@ -1,5 +1,5 @@
 import tensorflow as tf
-from keras import layers, losses, optimizers
+from keras import layers, losses, optimizers, metrics
 from arquitetura_NN import CNNEncoder, EnconderTransformer, FCLayer  # , CNNTransformer
 import numpy as np
 from dataset import autenticacoes_permissoes, rotulo_e_batimentos
@@ -8,8 +8,8 @@ import datetime
 import tensorflow_addons as tfa
 
 # hyperparametros
-num_layers_transformers = 4
-num_layers_cnn = 5
+num_layers_transformers = 2
+num_layers_cnn = 4
 num_filters = 64
 d_model = 256
 dff = 512
@@ -21,7 +21,7 @@ final_neurons = 256
 num_layers_dense = 3
 neurons_input_transformers = 256
 num_adversarios = 100
-GPU = 0
+GPU = 1
 
 
 def main():
@@ -35,8 +35,6 @@ def main():
                                          CNNEncoder(num_layers=num_layers_cnn, filters=num_filters,
                                                     kernel_size=kernel_size, max_pool_size=max_pool_size),
                                          layers.Flatten(),
-                                         layers.Dense(neurons_input_transformers, activation=layers.LeakyReLU(alpha=0.01)),
-                                         layers.BatchNormalization(),
                                          EnconderTransformer(num_layers=num_layers_transformers, d_model=d_model,
                                                              num_heads=num_heads, dff=dff,
                                                              dropout_rate=dropout_rate),
@@ -44,7 +42,7 @@ def main():
                                          FCLayer(num_layers=num_layers_dense, neurons=final_neurons)])
             model.summary()
             model.compile(optimizer=optimizers.Adam(0.001),
-                          loss=tfa.losses.TripletSemiHardLoss(), metrics=['accuracy'])
+                          loss=losses.SparseCategoricalCrossentropy(), metrics=[metrics.SparseCategoricalAccuracy()])
 
             checkpoint_path = "training_1/"+sinal_avaliado+"/"+datetime.datetime.now().strftime('%Y%m%d-%H%M%S')+"/cp.ckpt"
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
